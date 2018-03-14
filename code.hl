@@ -4,9 +4,13 @@ fib(int n) {
     int next;
 
     while(a < n) {
-        //print(a);
+        print(a);
         next = a + b;
         a = b;
         b = next;
     }
+}
+
+main() {
+    print("Olá mundo!");
 }

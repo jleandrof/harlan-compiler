@@ -73,6 +73,7 @@ if __name__ == '__main__':
         ('PAREND', '\)'),
         ('SQBREND', '\]'),
         ('CLBREND', '\}'),
+        ('STRING', '\".*?\"'),
         ('ID', '[a-zA-Z_]+[0-9]*[a-zA-Z_]*'),
     ]
     categories = {
@@ -103,7 +104,7 @@ if __name__ == '__main__':
         'PAREND': 25,
         'SQBREND': 26,
         'CLBREND': 27,
-        'NEWLINE': 28,
+        'STRING': 28,
         'ID': 29
     }
 
