@@ -1,0 +1,12 @@
+fib(int n) {
+    int a = 0;
+    int b = 1;
+    int next;
+
+    while(a < n) {
+        //print(a);
+        next = a + b;
+        a = b;
+        b = next;
+    }
+}

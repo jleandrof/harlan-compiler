@@ -20,18 +20,17 @@ class Tokenizer():
         self.pos = 0
         
         self.regex = re.compile('|'.join('(?P<%s>%s)' % token for token in tokens))
-        self.target = re.sub(re.compile('//.*?\n'), '', target)[:-1]
-        self.ws_skip = re.compile('\s')
+        self.target = re.sub(re.compile('^.*\/\/.*?\n'), '', target)[:-1]
+        self.ws_skip = re.compile('\s+')
 
     def hasToken(self):
         return False if self.pos >= len(self.target) else True
         
     def nextToken(self):
-#TODO
-# Decide if some of these are really necessary
+        
         ws = self.ws_skip.match(self.target, self.pos)
         if ws:
-            self.pos += 1
+            self.pos = ws.end()
             
         m = self.regex.match(self.target, self.pos)
         if m:
@@ -104,11 +103,17 @@ if __name__ == '__main__':
         'PAREND': 25,
         'SQBREND': 26,
         'CLBREND': 27,
-        'ID': 28
+        'NEWLINE': 28,
+        'ID': 29
     }
 
-    tokenizer = Tokenizer(tokens, categories, 'main range -125.0; print not }{12 //and a] % 2;\nmain\n')
+    with open('fib.hl') as f:
+        target = f.read()
+        target = target.split('\n')
+        print(target)
+        for line in target:
+            tokenizer = Tokenizer(tokens, categories, line + '\n')
 
-    while tokenizer.hasToken():
-        print(tokenizer.nextToken()) 
+            while tokenizer.hasToken():
+                print(tokenizer.nextToken()) 
     
