@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
     tokens = [
         ('KWMAIN', '(main)(?!\w)'),
-        ('KWIO', '(input|output)(?!\w)'),
+        ('KWIO', '(input|print)(?!\w)'),
         ('KWIF', '(if)(?!\w)'),
         ('KWELSE', '(else)(?!\w)'),
         ('KWFOR', '(for)(?!\w)'),
@@ -107,7 +107,7 @@ if __name__ == '__main__':
         'ID': 28
     }
 
-    tokenizer = Tokenizer(tokens, categories, 'main range -125.0; not }{12 //and a] % 2;\nmain\n')
+    tokenizer = Tokenizer(tokens, categories, 'main range -125.0; print not }{12 //and a] % 2;\nmain\n')
 
     while tokenizer.hasToken():
         print(tokenizer.nextToken()) 
