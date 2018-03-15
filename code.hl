@@ -12,5 +12,5 @@ fib(int n) {
 }
 
 main() {
-    print("Olá mundo!");
+    print("Ola mundo!");
 }

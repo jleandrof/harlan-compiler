@@ -1,0 +1,26 @@
+int maxsize = 10
+int array = [5, 7, 2, 0, 9, 6, 1, 3, 4, 8] 
+
+int[] shellsort() {
+    int inner, outer;
+    int valueToInsert;
+    int interval = 1;
+    int elements = MAX;
+    int i = 0;
+
+    while(interval  <= elements/3) {
+        interval = interval * 3 + 1;
+    }
+
+    outer = interval;
+    for outer in range(outer, elements) {
+    	valueToInsert = array[outer];
+	inner = outer;
+    }
+
+    while(inner > (interval - 1) and array[inner - interval] >= valueToInsert) {
+    array[inner] = array[inner - interval];
+    inner = inner - interval
+    }
+     
+}

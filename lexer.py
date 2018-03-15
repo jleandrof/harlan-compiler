@@ -1,4 +1,5 @@
 import re
+import sys
 
 class Token():
 
@@ -17,30 +18,40 @@ class Tokenizer():
         
         self.tokens = tokens
         self.categories = categories
-        self.pos = 0
-        
+        self.column = 0
+        self.row = 0
         self.regex = re.compile('|'.join('(?P<%s>%s)' % token for token in tokens))
-        self.target = re.sub(re.compile('^.*\/\/.*?\n'), '', target)[:-1]
+        
+        target = re.sub(re.compile('^.*\/\/.*?\n'), '', target)[:-1]
+        #self.target = target.splitlines()
+        self.target = [s for s in target.splitlines() if s]
         self.ws_skip = re.compile('\s+')
 
+        #print(self.target)
+        
     def hasToken(self):
-        return False if self.pos >= len(self.target) else True
+        return False if (self.row >= len(self.target)) else True
         
     def nextToken(self):
-        
-        ws = self.ws_skip.match(self.target, self.pos)
+
+        ws = self.ws_skip.match(self.target[self.row], self.column)
         if ws:
-            self.pos = ws.end()
+            self.column = ws.end()
             
-        m = self.regex.match(self.target, self.pos)
+        m = self.regex.match(self.target[self.row], self.column)
         if m:
             category_id = m.lastgroup
             category_num = self.categories[category_id]
-            new_token = Token((self.pos, 1), (category_num, category_id), m.string[m.start():m.end()])
-            self.pos = m.end()
+            new_token = Token((self.row + 1, self.column + 1), (category_num, category_id), m.string[m.start():m.end()])
+            self.column = m.end()
+            if self.column >= len(self.target[self.row]):
+                self.column = 0
+                self.row += 1
             return new_token
 
-        self.pos = len(self.target)
+        #print(self.target[self.row][self.column])
+        self.column = len(self.target[self.row])
+        self.row = len(self.target)
         return 'error'
         
 if __name__ == '__main__':
@@ -108,12 +119,11 @@ if __name__ == '__main__':
         'ID': 29
     }
 
-    with open('fib.hl') as f:
-        target = f.read()
-        target = target.split('\n')
-        print(target)
-        for line in target:
-            tokenizer = Tokenizer(tokens, categories, line + '\n')
+    for filename in sys.argv[-1:]:
+        print(filename + ":")
+        with open(filename) as f:
+            target = f.read()
+            tokenizer = Tokenizer(tokens, categories, target)
 
             while tokenizer.hasToken():
                 print(tokenizer.nextToken()) 
