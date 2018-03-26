@@ -12,10 +12,9 @@ fib(int n) {
     }
 }
 
-
-
-
 //hello.hl
 main() {
     print("Ola mundo!");
 }
+
+
