@@ -1,26 +1,57 @@
-int maxsize = 10
-int array = [5, 7, 2, 0, 9, 6, 1, 3, 4, 8] 
+//shellsort.hl
 
-int[] shellsort() {
+int maxsize = 10;
+
+int[] shellsort(int[] array) {
     int inner, outer;
     int valueToInsert;
     int interval = 1;
-    int elements = MAX;
+    int elements = maxsize;
     int i = 0;
 
-    while(interval  <= elements/3) {
+    while(interval  <= elements / 3) {
         interval = interval * 3 + 1;
     }
 
-    outer = interval;
-    for outer in range(outer, elements) {
-    	valueToInsert = array[outer];
-	inner = outer;
+    while(interval > 0) {
+        outer = interval;
+    	for outer in range(outer, elements) {
+    	    valueToInsert = array[outer];
+	    inner = outer
+
+	    while(inner > (interval - 1) and array[inner - interval] >= valueToInsert) {
+    	        array[inner] = array[inner - interval];
+    	        inner = inner - interval;
+	    }
+
+    	    array[inner] = valueToInsert;
+    	}
+
+    	interval = (interval - 1) / 3;
+    	i = i + 1;
     }
 
-    while(inner > (interval - 1) and array[inner - interval] >= valueToInsert) {
-    array[inner] = array[inner - interval];
-    inner = inner - interval
-    }
-     
+    return array;
 }
+
+print_array(int[] array) {
+
+    int i;
+
+    print("[");
+    for i in range(0, maxsize) {
+    	print("%d ", array[i]);
+    }
+    print("]\n");
+}
+
+main() {
+    int array = [5, 7, 2, 0, 9, 6, 1, 3, 4, 8];
+
+    print("Array Original: ");
+    print_array(array);
+
+    print("Array Ordenado: ");
+    print_array(shellsort(array));
+}
+

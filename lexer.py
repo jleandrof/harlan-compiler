@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+""" Lexical Analizer"""
+
 import re
 import sys
 
@@ -9,10 +12,31 @@ class Token():
         self.line, self.column = pos
 
     def __str__(self):
-        return '[%03d, %03d] (%04d, %10s) {%s}' % (self.line, self.column, self.category_num, self.category_id, self.value)
+        return '[%03d, %03d] (%04d, %10s) {%s}' % (self.line,
+                                                   self.column,
+                                                   self.category_num,
+                                                   self.category_id,
+                                                   self.value)
+
 
 
 class Tokenizer():
+    """Separate a string into tokens
+
+    Attributes:
+        tokens (list of tuples): Each tuple stores a token category and 
+            its regular expression.
+        categories (dict): Maps the category names to its identification 
+            numbers.
+        column (int): Number of the current column.
+        row (int): Number of the current row.
+        regex (:obj:'re'): The regex from the tokens atribute grouped and
+            joined by the '|' operator.
+        target (list of str): The entire target string is passed on the 
+            constructor. It will be stripped of comments and split into lines
+        ws_skip (:obj:'re'): Regular expression to match whitespace.
+        el_skip (:obj:'re'): Regular expression to match empty lines.
+    """
 
     def __init__(self, tokens, categories, target):
         
@@ -20,40 +44,52 @@ class Tokenizer():
         self.categories = categories
         self.column = 0
         self.row = 0
+        
         self.regex = re.compile('|'.join('(?P<%s>%s)' % token for token in tokens))
         
-        target = re.sub(re.compile('^.*\/\/.*?\n'), '', target)[:-1]
-        #self.target = target.splitlines()
-        self.target = [s for s in target.splitlines() if s]
+        target = re.sub(re.compile('\s*\/\/.*?\n'), '', target)[:-1]
+        self.target = target.splitlines()
         self.ws_skip = re.compile('\s+')
-
-        #print(self.target)
+        self.el_skip = re.compile('^$')
         
     def hasToken(self):
-        return False if (self.row >= len(self.target)) else True
+        """Check if there are tokens remaining in the string."""
+        
+        return False if self.row >= len(self.target) else True
         
     def nextToken(self):
+        """Returns the next matched token.
 
+        The first section checks if there is an empty line on the next
+        position - If there is, the current row will be updated to skip
+        it. Whitespaces are skipped here by ws_skip.
+        Returns 'Invalid token' if no token is matched.
+        """
+        el = self.el_skip.match(self.target[self.row], self.column)
+        if el:
+            self.row += 1
+            
         ws = self.ws_skip.match(self.target[self.row], self.column)
         if ws:
             self.column = ws.end()
             
-        m = self.regex.match(self.target[self.row], self.column)
-        if m:
-            category_id = m.lastgroup
+        token_match = self.regex.match(self.target[self.row], self.column)
+        if token_match:
+            category_id = token_match.lastgroup
             category_num = self.categories[category_id]
-            new_token = Token((self.row + 1, self.column + 1), (category_num, category_id), m.string[m.start():m.end()])
-            self.column = m.end()
+            new_token = Token((self.row + 1, self.column + 1),
+                              (category_num, category_id),
+                              token_match.string[token_match.start():token_match.end()])
+            self.column = token_match.end()
             if self.column >= len(self.target[self.row]):
                 self.column = 0
                 self.row += 1
             return new_token
-
-        #print(self.target[self.row][self.column])
-        self.column = len(self.target[self.row])
-        self.row = len(self.target)
-        return 'error'
         
+        error = '[%03d, %03d] Invalid token' % (self.row + 1, self.column)
+        self.row = len(self.target)
+        return error
+
 if __name__ == '__main__':
 
     tokens = [
@@ -85,6 +121,7 @@ if __name__ == '__main__':
         ('SQBREND', '\]'),
         ('CLBREND', '\}'),
         ('STRING', '\".*?\"'),
+        ('KWRETURN', '(return)(?!\w)'),
         ('ID', '[a-zA-Z_]+[0-9]*[a-zA-Z_]*'),
     ]
     categories = {
@@ -116,15 +153,18 @@ if __name__ == '__main__':
         'SQBREND': 26,
         'CLBREND': 27,
         'STRING': 28,
-        'ID': 29
+        'KWRETURN': 29,
+        'ID': 30
     }
 
-    for filename in sys.argv[-1:]:
+    for filename in sys.argv[1:]:
         print(filename + ":")
         with open(filename) as f:
             target = f.read()
             tokenizer = Tokenizer(tokens, categories, target)
 
             while tokenizer.hasToken():
-                print(tokenizer.nextToken()) 
+                print(tokenizer.nextToken())
+
+        print()
     
