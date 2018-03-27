@@ -57,21 +57,23 @@ class Tokenizer():
         
     def hasToken(self):
         """Check if there are tokens remaining in the string."""
-        
+
         return False if self.row >= len(self.target) else True
         
     def nextToken(self):
         """Returns the next matched token.
 
-        The first section checks if there is an empty line on the next
-        position - If there is, the current row will be updated to skip
-        it. Whitespaces are skipped here by ws_skip.
+        The first section checks if there are empty lines on the next
+        position - If so, the current row will be updated to skip
+        them. Whitespaces are skipped here by ws_skip.
         Returns 'Invalid token' if no token is matched.
         """
 
         while(self.hasToken() and not self.target[self.row]):
+            
             self.row += 1
         if self.hasToken():
+            
             ws = self.ws_skip.match(self.target[self.row], self.column) 
             if ws:
                 self.column = ws.end()
@@ -92,8 +94,8 @@ class Tokenizer():
             error = '[%03d, %03d] Invalid token' % (self.row + 1, self.column)
             self.row = len(self.target)
             return error
-        else:
-            return ''
+            
+        return ''
 
 if __name__ == '__main__':
 
