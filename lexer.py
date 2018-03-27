@@ -48,15 +48,10 @@ class Tokenizer():
         self.regex = re.compile('|'.join('(?P<%s>%s)' % token for token in tokens))
 
         self.target = target.splitlines()
-        print(self.target)
 
         for i, item in enumerate(self.target):
-            print(item)
             self.target[i] = re.sub(re.compile('(?m)^ *\/\/.*\n?'), '', item)
-            print(self.target[i])
 
-            
-        print(self.target)
         self.ws_skip = re.compile('\s+')
         #self.el_skip = re.compile('\A\z')
         
@@ -74,10 +69,6 @@ class Tokenizer():
         Returns 'Invalid token' if no token is matched.
         """
 
-        #TODO:
-        #   Clean this
-        
-        #el = self.el_skip.match(self.target[self.row], self.column)
         while(self.hasToken() and not self.target[self.row]):
             self.row += 1
         if self.hasToken():
@@ -86,23 +77,23 @@ class Tokenizer():
                 self.column = ws.end()
             
             token_match = self.regex.match(self.target[self.row], self.column)
+            if token_match:
+                category_id = token_match.lastgroup
+                category_num = self.categories[category_id]
+                new_token = Token((self.row + 1, self.column + 1),
+                                  (category_num, category_id),
+                                  token_match.string[token_match.start():token_match.end()])
+                self.column = token_match.end()
+                if self.column >= len(self.target[self.row]):
+                    self.column = 0
+                    self.row += 1
+                return new_token
+
+            error = '[%03d, %03d] Invalid token' % (self.row + 1, self.column)
+            self.row = len(self.target)
+            return error
         else:
-            return 'EOF'
-        if token_match:
-            category_id = token_match.lastgroup
-            category_num = self.categories[category_id]
-            new_token = Token((self.row + 1, self.column + 1),
-                              (category_num, category_id),
-                              token_match.string[token_match.start():token_match.end()])
-            self.column = token_match.end()
-            if self.column >= len(self.target[self.row]):
-                self.column = 0
-                self.row += 1
-            return new_token
-        
-        error = '[%03d, %03d] Invalid token' % (self.row + 1, self.column)
-        self.row = len(self.target)
-        return error
+            return ''
 
 if __name__ == '__main__':
 
