@@ -4,8 +4,10 @@
 import re
 import sys
 
+
 class Token():
 
+    
     def __init__(self, pos, category, value):
         self.category_num, self.category_id = category
         self.value = value
@@ -17,7 +19,6 @@ class Token():
                                                    self.category_num,
                                                    self.category_id,
                                                    self.value)
-
 
 
 class Tokenizer():
@@ -35,25 +36,93 @@ class Tokenizer():
         target (list of str): The entire target string is passed on the 
             constructor. It will be stripped of comments and split into lines
         ws_skip (:obj:'re'): Regular expression to match whitespace.
-        el_skip (:obj:'re'): Regular expression to match empty lines.
     """
 
-    def __init__(self, tokens, categories, target):
+    
+    def __init__(self, target):
+#TODO:
+#    Fix token specification
+        self.tokens = [
+            ('KWMAIN', '(main)(?!\w)'),
+            ('KWIO', '(input|print)(?!\w)'),
+            ('KWIF', '(if)(?!\w)'),
+            ('KWELSE', '(else)(?!\w)'),
+            ('KWFOR', '(for)(?!\w)'),
+            ('KWWHILE', '(while)(?!\w)'),
+            ('KWRANGE', '(range)(?!\w)'),
+            ('STRTYPE', '(string)(?!\w)'),
+            ('ITYPE', '(int)(?!\w)'),
+            ('FTYPE', '(float)(?!\w)'),
+            ('BTYPE', '(bool)(?!\w)'),
+            ('CTEFLOAT', '[+-]?\d+\.\d+(?!\w)'),
+            ('CTEINT', '[+-]?\d+(?!\w)'),
+            ('LTBOOL', '(true|false)(?!\w)'),
+            ('OPCMP', '>=|>|<=|<|==|!='),
+            ('OPAT', '='),
+            ('OPMBR', '(in)(?!\w)'),
+            ('OPAD', '\+|-'),
+            ('OPML', '\*|/|%'),
+            ('OPCONJ', '(?<!\w)(and)(?!\w)'),
+            ('OPDISJ', '(or)(?!\w)'),
+            ('OPNEG', '(not)(?!\w)'),
+            ('ST', ';'),
+            ('CLN', ','),
+            ('PARST', '\('),
+            ('SQBRST', '\['),
+            ('CLBRST', '\{'),
+            ('PAREND', '\)'),
+            ('SQBREND', '\]'),
+            ('CLBREND', '\}'),
+            ('LTSTRING', '\".*?\"'),
+            ('KWRETURN', '(return)(?!\w)'),
+            ('ID', '[a-zA-Z_]+[0-9]*[a-zA-Z_]*'),
+        ]
         
-        self.tokens = tokens
-        self.categories = categories
+        self.categories = {
+            'KWMAIN': 1,
+            'KWIO': 2,
+            'KWIF': 3,
+            'KWELSE': 4,
+            'KWFOR': 5,
+            'KWWHILE': 6,
+            'KWRANGE': 7,
+            'STRTYPE': 8,
+            'ITYPE': 9,
+            'FTYPE': 10,
+            'BTYPE': 11,
+            'CTEFLOAT': 12,
+            'CTEINT': 13,
+            'LTBOOL': 14,
+            'OPCMP': 15,
+            'OPAT': 16,
+            'OPMBR': 17,
+            'OPAD': 18,
+            'OPML': 19,
+            'OPCONJ': 20,
+            'OPDISJ': 21,
+            'OPNEG': 22,
+            'ST': 23,
+            'CLN': 24,
+            'PARST': 25,
+            'SQBRST': 26,
+            'CLBRST': 27,
+            'PAREND': 28,
+            'SQBREND': 29,
+            'CLBREND': 30,
+            'LTSTRING': 31,
+            'KWRETURN': 32,
+            'ID': 33
+        }
+        
         self.column = 0
         self.row = 0
         
-        self.regex = re.compile('|'.join('(?P<%s>%s)' % token for token in tokens))
-
+        self.regex = re.compile('|'.join('(?P<%s>%s)' % token for token in self.tokens))
+        self.ws_skip = re.compile('\s+')
+        
         self.target = target.splitlines()
-
         for i, item in enumerate(self.target):
             self.target[i] = re.sub(re.compile('(?m)^ *\/\/.*\n?'), '', item)
-
-        self.ws_skip = re.compile('\s+')
-        #self.el_skip = re.compile('\A\z')
         
     def hasToken(self):
         """Check if there are tokens remaining in the string."""
@@ -70,10 +139,9 @@ class Tokenizer():
         """
 
         while(self.hasToken() and not self.target[self.row]):
-            
             self.row += 1
-        if self.hasToken():
             
+        if self.hasToken():
             ws = self.ws_skip.match(self.target[self.row], self.column) 
             if ws:
                 self.column = ws.end()
@@ -96,82 +164,4 @@ class Tokenizer():
             return error
             
         return ''
-
-if __name__ == '__main__':
-
-    tokens = [
-        ('KWMAIN', '(main)(?!\w)'),
-        ('KWIO', '(input|print)(?!\w)'),
-        ('KWIF', '(if)(?!\w)'),
-        ('KWELSE', '(else)(?!\w)'),
-        ('KWFOR', '(for)(?!\w)'),
-        ('KWWHILE', '(while)(?!\w)'),
-        ('KWRANGE', '(range)(?!\w)'),
-        ('PTYPE', '(string|int|float|bool)(?!\w)'),
-        ('CTEFLOAT', '[+-]?\d+\.\d+(?!\w)'),
-        ('CTEINT', '[+-]?\d+(?!\w)'),
-        ('LTBOOL', '(true|false)(?!\w)'),
-        ('OPCMP', '>=|>|<=|<|==|!='),
-        ('OPAT', '='),
-        ('OPMBR', '(in)(?!\w)'),
-        ('OPAD', '\+|-'),
-        ('OPML', '\*|/|%'),
-        ('OPCONJ', '(?<!\w)(and)(?!\w)'),
-        ('OPDISJ', '(or)(?!\w)'),
-        ('OPNEG', '(not)(?!\w)'),
-        ('ST', ';'),
-        ('CLN', ','),
-        ('PARST', '\('),
-        ('SQBRST', '\['),
-        ('CLBRST', '\{'),
-        ('PAREND', '\)'),
-        ('SQBREND', '\]'),
-        ('CLBREND', '\}'),
-        ('STRING', '\".*?\"'),
-        ('KWRETURN', '(return)(?!\w)'),
-        ('ID', '[a-zA-Z_]+[0-9]*[a-zA-Z_]*'),
-    ]
-    categories = {
-        'KWMAIN': 1,
-        'KWIO': 2,
-        'KWIF': 3,
-        'KWELSE': 4,
-        'KWFOR': 5,
-        'KWWHILE': 6,
-        'KWRANGE': 7,
-        'PTYPE': 8,
-        'CTEFLOAT': 9,
-        'CTEINT': 10,
-        'LTBOOL': 11,
-        'OPCMP': 12,
-        'OPAT': 13,
-        'OPMBR': 14,
-        'OPAD': 15,
-        'OPML': 16,
-        'OPCONJ': 17,
-        'OPDISJ': 18,
-        'OPNEG': 19,
-        'ST': 20,
-        'CLN': 21,
-        'PARST': 22,
-        'SQBRST': 23,
-        'CLBRST': 24,
-        'PAREND': 25,
-        'SQBREND': 26,
-        'CLBREND': 27,
-        'STRING': 28,
-        'KWRETURN': 29,
-        'ID': 30
-    }
-
-    for filename in sys.argv[1:]:
-        print(filename + ":")
-        with open(filename) as f:
-            target = f.read()
-            tokenizer = Tokenizer(tokens, categories, target)
-
-            while tokenizer.hasToken():
-                print(tokenizer.nextToken())
-
-        print()
     
