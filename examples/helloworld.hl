@@ -1,0 +1,6 @@
+//hello.hl
+
+main() {
+    print("Ola mundo!");
+}
+

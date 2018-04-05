@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from lexer import Tokenizer
 import sys
 
@@ -16,3 +17,5 @@ for filename in sys.argv[1:]:
         
         while tokenizer.hasToken():
             print(tokenizer.nextToken())
+
+        print()
