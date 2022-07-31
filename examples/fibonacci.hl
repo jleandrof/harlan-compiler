@@ -12,7 +12,7 @@ fib(int n) {
         print(", %d", next);
         a = b;
         b = next;
-	next = a + b;
+		next = a + b;
     }
 }
 
