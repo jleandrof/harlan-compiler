@@ -191,6 +191,7 @@ class Tokenizer():
             'KWRETURN': 33,
             'ID': 34,
             'INVALID': 35,
+            'EPSILON': 36
         }
 
         self.column = 0
