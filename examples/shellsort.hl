@@ -1,9 +1,10 @@
 //shellsort.hl
 
-int maxsize = 10;
+int maxsize;
 
 int[] shellsort(int[] array) {
-    int inner, outer;
+    int inner;
+	int outer;
     int valueToInsert;
     int interval = 1;
     int elements = maxsize;
@@ -17,12 +18,12 @@ int[] shellsort(int[] array) {
         outer = interval;
     	for outer in range(outer, elements) {
     	    valueToInsert = array[outer];
-	    inner = outer
+			inner = outer;
 
-	    while(inner > (interval - 1) and array[inner - interval] >= valueToInsert) {
-    	        array[inner] = array[inner - interval];
-    	        inner = inner - interval;
-	    }
+			while(inner > (interval - 1) and array[inner - interval] >= valueToInsert) {
+				array[inner] = array[inner - interval];
+				inner = inner - interval;
+			}
 
     	    array[inner] = valueToInsert;
     	}
@@ -46,7 +47,18 @@ print_array(int[] array) {
 }
 
 main() {
-    int array = [5, 7, 2, 0, 9, 6, 1, 3, 4, 8];
+	maxsize = 10;
+    int array[10];
+	array[0] = 5;
+	array[0] = 7;
+	array[0] = 2;
+	array[0] = 0;
+	array[0] = 9;
+	array[0] = 6;
+	array[0] = 1;
+	array[0] = 3;
+	array[0] = 4;
+	array[0] = 8;
 
     print("Array Original: ");
     print_array(array);
@@ -54,4 +66,3 @@ main() {
     print("Array Ordenado: ");
     print_array(shellsort(array));
 }
-

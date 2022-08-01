@@ -19,4 +19,3 @@ fib(int n) {
 main() {
     fib(input());
 }
-
