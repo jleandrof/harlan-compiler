@@ -1,0 +1,10 @@
+//string f(int b) {;}
+//g(float b){}
+main() {
+	int a[3];
+	for item in f();
+	if(true or false and true){
+		f(3);
+		a = b;
+	}
+}
